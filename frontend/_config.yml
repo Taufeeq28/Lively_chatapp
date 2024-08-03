@@ -1,0 +1,35 @@
+# Site settings
+title: Lively-chatapp
+email: sameerahmed6686@gmail.com
+description: >- # this means to ignore newlines until "baseurl:"
+  Write an awesome description for your new site here.
+baseurl: "/Lively-Chatapp"  # the subpath of your site, e.g. /blog
+url: "https://taufeeq28.github.io"
+
+
+markdown: kramdown
+theme: minima
+
+exclude:
+  - node_modules
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - Rakefile
+  - .gitignore
+  - .gitattributes
+  - .jekyll-cache
+  - .jekyll-metadata
+
+# Include any other necessary Jekyll configurations
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Ensure GitHub Pages is set up correctly
+github:
+  is_project_page: true
+  url: "https://taufeeq28.github.io/Lively-Chatpp"
+  repository: "taufeeq28/Lively-Chatpp"
