@@ -20,6 +20,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4000",
+  "https://lively-chatapp-backend.vercel.app",
   "https://lively-chatapp-frontend.vercel.app",
   
 ];
