@@ -20,8 +20,8 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4000",
-  "https://lively-chatapp.app",
-  "https://taufeeq28.github.io/Lively-chatpp"
+  "https://lively-chatapp-frontend.vercel.app",
+  
 ];
 
 const corsOptions = {
