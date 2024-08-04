@@ -44,8 +44,8 @@ app.use("/api/user", userRoute);
 app.use("/api/avatar", avatarRoute);
 
 const port = process.env.PORT || 8000;
-const server = app.listen(port, () => console.log(`Application is running on port ${port}`));
-
+//const server = app.listen(port, () => console.log(`Application is running on port ${port}`));
+const server = http.createServer(app);
 createWebSocketServer(server);
 
 app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
