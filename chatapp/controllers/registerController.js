@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { User, validateRegister } = require("../models/userModel.js");
 const { Token } = require("../models/tokenModel.js");
 const sendEmail = require("../utils/sendEmail.js");
