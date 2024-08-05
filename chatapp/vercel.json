@@ -19,5 +19,9 @@
       "src": "/(.*)",
       "dest": "/frontend/dist/$1"
     }
-  ]
+  ],"functions": {
+    "index.js": {
+      "maxDuration": 30
+    }
+  }
 }
