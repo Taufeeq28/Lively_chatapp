@@ -1,14 +1,16 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const app = express();
+const http = require("http");
+const path = require("path");
+const cookieParser = require("cookie-parser");
 const connection = require("./db/db.js");
 const userRoute = require("./routes/userRoute.js");
 const avatarRoute = require("./routes/avatarRoute.js");
-const cookieParser = require("cookie-parser");
 const createWebSocketServer = require("./wsServer.js");
-const path = require("path");
-const http = require('http'); 
+
+const app = express();
+
 // Database connection
 connection();
 
@@ -22,7 +24,6 @@ const allowedOrigins = [
   "http://localhost:4000",
   "https://lively-chatapp-backend.vercel.app",
   "https://lively-chatapp-frontend.vercel.app",
-  
 ];
 
 const corsOptions = {
@@ -44,17 +45,29 @@ app.use(cors(corsOptions));
 app.use("/api/user", userRoute);
 app.use("/api/avatar", avatarRoute);
 
-const port = process.env.PORT || 8000;
-//const server = app.listen(port, () => console.log(`Application is running on port ${port}`));
-const server = http.createServer(app);
-createWebSocketServer(server);
+// Health check route
+app.get("/health", (req, res) => {
+  res.send("Server is running");
+});
 
+// Serve static files
 app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
 
 app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'frontend/dist/index.html'), err => {
+  res.sendFile(path.join(__dirname, "..", "frontend/dist/index.html"), (err) => {
     if (err) {
-      console.error('Error sending file:', err);
+      console.error("Error sending file:", err);
     }
   });
+});
+
+// Create HTTP server
+const port = process.env.PORT || 8000;
+const server = http.createServer(app);
+
+// Initialize WebSocket server
+createWebSocketServer(server);
+
+server.listen(port, () => {
+  console.log(`Application is running on port ${port}`);
 });
