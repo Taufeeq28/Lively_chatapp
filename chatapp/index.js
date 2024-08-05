@@ -8,7 +8,7 @@ const avatarRoute = require("./routes/avatarRoute.js");
 const cookieParser = require("cookie-parser");
 const createWebSocketServer = require("./wsServer.js");
 const path = require("path");
-
+const http = require('http'); 
 // Database connection
 connection();
 
