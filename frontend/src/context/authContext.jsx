@@ -1,11 +1,15 @@
 import PropTypes from 'prop-types';
 import Cookies from "js-cookie";
-import  { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const setAuthenticated = (value) => {
     setIsAuthenticated(value);
@@ -14,6 +18,7 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = () => {
     const token = Cookies.get("authToken");
     console.log("Checking authentication...");
+    console.log("Token:", token); // Log the token value to debug
     if (token) {
       console.log("Token exists. Setting authenticated to true.");
       setAuthenticated(true);
@@ -25,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     Cookies.remove("authToken");
-    setAuthenticated(false);
+    setIsAuthenticated(false);
   };
 
   return (

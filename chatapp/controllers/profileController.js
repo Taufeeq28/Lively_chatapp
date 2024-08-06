@@ -3,12 +3,14 @@ const { User } = require("../models/userModel");
 
 const profileController = async (req, res) => {
   const token = req.cookies.authToken;
+  console.log("Received token:", token); // Log the token received
   if (token) {
     jwt.verify(token, process.env.JWTPRIVATEKEY, {}, async (err, userData) => {
       if (err) {
         console.error("Token verification failed:", err);
         return res.status(403).json("Invalid token");
       }
+      console.log("Token verified, userData:", userData); // Log user data extracted from token
       const user = await User.findById(userData._id);
       if (!user) {
         return res.status(404).json("User not found");
@@ -19,7 +21,6 @@ const profileController = async (req, res) => {
     res.status(401).json("No token");
   }
 };
-
 const profileUpdate = async (req, res) => {
   const token = req.cookies?.authToken;
   if (token) {
