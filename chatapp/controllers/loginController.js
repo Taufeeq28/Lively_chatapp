@@ -47,7 +47,7 @@ const loginController = async (req, res) => {
       sameSite: "none",
       secure: process.env.NODE_ENV === "production", // Use secure flag only in production
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : "localhost", // Update this to match your domain
+      domain: process.env.NODE_ENV === "production" ? "lively-chatapp-backend.vercel.app" : "localhost", // Update this to match your domain
       path: "/",
     }).send({ message: "Login successful", status: 200 });
     console.log("Token set successfully:", token);
