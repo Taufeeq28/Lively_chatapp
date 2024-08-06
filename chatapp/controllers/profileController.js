@@ -2,15 +2,21 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../models/userModel");
 
 const profileController = async (req, res) => {
-  const token = req.cookies?.authToken;
+  const token = req.cookies.authToken;
   if (token) {
     jwt.verify(token, process.env.JWTPRIVATEKEY, {}, async (err, userData) => {
-      if (err) throw err;
-      const user = await User.findOne({ _id: userData._id });
+      if (err) {
+        console.error("Token verification failed:", err);
+        return res.status(403).json("Invalid token");
+      }
+      const user = await User.findById(userData._id);
+      if (!user) {
+        return res.status(404).json("User not found");
+      }
       res.json(user);
     });
   } else {
-    res.status(401).json("no token");
+    res.status(401).json("No token");
   }
 };
 
