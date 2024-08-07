@@ -30,8 +30,8 @@ const Login = () => {
       const response = await axios.post(url, data, {
         withCredentials: true,
         headers: {
-          'Content-Type': 'application/json'
-        }
+        'Content-Type': 'application/json'
+      }
       });
 
       if (response.status === 200) {
