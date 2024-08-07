@@ -24,7 +24,7 @@ const loginController = async (req, res) => {
 
     const token = user.generateAuthToken();
     res.status(200).cookie("authToken", token, {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: "none",
       secure: true,
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
