@@ -16,8 +16,8 @@
       "dest": "/index.js"
     },
     {
-      "src": "/users/(.*)",
-      "dest": "/index.js"
+      "src": "users/(.*)",
+      "dest": "/api/users/$1"
     },
     {
       "src": "/(.*)",
