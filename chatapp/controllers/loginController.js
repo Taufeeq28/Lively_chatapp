@@ -23,11 +23,13 @@ const loginController = async (req, res) => {
     }
 
     const token = user.generateAuthToken();
+    console.log(`Setting authToken cookie for user: ${req.user?.id || 'unknown'}`);
     res.status(200).cookie("authToken", token, {
       httpOnly: false,
       sameSite: "none",
       domain: process.env.NODE_ENV === "production" ? "lively-chatapp-backend.vercel.app" : "localhost", // Update this to match your domain
       secure: true,
+      path: "/",
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     }).send({ message: "Login successful", status: 200 });
   }
