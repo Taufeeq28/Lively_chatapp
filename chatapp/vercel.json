@@ -16,6 +16,10 @@
       "dest": "/index.js"
     },
     {
+      "src": "/users/(.*)",
+      "dest": "/index.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/frontend/dist/$1"
     }
