@@ -26,7 +26,7 @@ const loginController = async (req, res) => {
     res.status(200).cookie("authToken", token, {
       httpOnly: false,
       sameSite: "none",
-      domain: ".lively-chatapp-backend.vercel.app",
+      domain: process.env.NODE_ENV === "production" ? "lively-chatapp-backend.vercel.app" : "localhost", // Update this to match your domain
       secure: true,
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     }).send({ message: "Login successful", status: 200 });
