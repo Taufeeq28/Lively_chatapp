@@ -22,14 +22,8 @@ const loginController = async (req, res) => {
       return res.status(400).send({ message: "User doesn't exist" });
     }
 
-    const user1 = await User.findByCredentials(req.body.email, req.body.password);
-    if (!user1) {
-      return res.status(400).send({ message: "Invalid login credentials" });
-    }
-  
     const token = user.generateAuthToken();
-  
-    console.log(`Setting authToken cookie for user: ${user._id}`);
+    console.log(`Setting authToken cookie for user: ${req.user?.id || 'unknown'}`);
     res.status(200).cookie("authToken", token, {
       httpOnly: false,
       sameSite: "none",
