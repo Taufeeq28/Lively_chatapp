@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import Cookies from "js-cookie";
-import  { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -10,6 +10,11 @@ export const AuthProvider = ({ children }) => {
   const setAuthenticated = (value) => {
     setIsAuthenticated(value);
   };
+
+  // ✅ Check authentication on page load
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const checkAuth = () => {
     const token = Cookies.get("authToken");
