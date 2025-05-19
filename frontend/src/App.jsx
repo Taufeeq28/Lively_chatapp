@@ -1,12 +1,10 @@
-// App.jsx
-import  { useEffect } from "react";
 import {
   createBrowserRouter,
   RouterProvider,
   Outlet,
   ScrollRestoration,
 } from "react-router-dom";
-import './App.css';
+import "./App.css";
 import Register from "./pages/Register";
 import Login from "./pages/Login.jsx";
 import Home from "./pages/Home";
@@ -18,14 +16,14 @@ import ChatHome from "./pages/ChatHome";
 import { ProfileProvider } from "./context/profileContext";
 import Profile from "./components/Profile";
 import { baseUrl } from "../apiConfig.js";
-
 import EmailSent from "./pages/EmailSent.jsx";
-const Layout = () => {
-  const { isAuthenticated, checkAuth } = useAuth();
+import ProtectedRoute from "./components/ProtectedRoute"; // ✅ import protected route
 
-  useEffect(() => {
-    checkAuth();
-  }, [isAuthenticated]);
+// Layout wrapper
+const Layout = () => {
+  const { loading } = useAuth();
+
+  if (loading) return <p>Loading...</p>; // ✅ Firebase auth is initializing
 
   return (
     <>
@@ -35,6 +33,7 @@ const Layout = () => {
   );
 };
 
+// React Router Setup
 const router = createBrowserRouter([
   {
     path: "/",
@@ -53,7 +52,7 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
-        path: "emailsent", // Add new route for EmailSent
+        path: "emailsent",
         element: <EmailSent />,
       },
       {
@@ -62,17 +61,25 @@ const router = createBrowserRouter([
       },
       {
         path: "chathome",
-        element: <ChatHome />,
+        element: (
+          <ProtectedRoute>
+            <ChatHome />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "profile",
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
-      
     ],
   },
 ]);
 
+// Root App
 function App() {
   axios.defaults.baseURL = baseUrl;
   axios.defaults.withCredentials = true;
@@ -80,9 +87,8 @@ function App() {
   return (
     <AuthProvider>
       <ProfileProvider>
-        <RouterProvider router={router}>
-          <Toaster />
-        </RouterProvider>
+        <RouterProvider router={router} />
+        <Toaster />
       </ProfileProvider>
     </AuthProvider>
   );

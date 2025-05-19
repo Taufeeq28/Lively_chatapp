@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-//import hero from "../assets/react.svg";
 import lottieFile from '../assets/lotti.json';
 import { useAuth } from "../context/authContext";
 import AnimationLottie from "./helper/animation-lottie";
@@ -12,12 +11,12 @@ const Hero = () => {
       <div className="grid max-w-screen-xl px-4 py-8 mx-auto lg:grid-cols-12 lg:gap-8 xl:gap-0 lg:py-16">
         <div className="mr-auto place-self-center lg:col-span-7">
           <h1 className="max-w-2xl mb-4 text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl">
-            Lively Chat: Instant Connections, Effortless Conversations
+            LivelyChat: Connect with Neighbors, Not Strangers
           </h1>
           <p className="max-w-2xl mb-6 font-light lg:mb-8 md:text-lg lg:text-xl">
-            Connect Seamlessly, Chat Effortlessly: Elevate Your Communication
-            with Our Intuitive Chat Application!
+            Discover the people living around you, share updates, start conversations, and build a thriving local community — one chat at a time.
           </p>
+
           {!isAuthenticated && (
             <Link
               to="/login"
@@ -38,12 +37,13 @@ const Hero = () => {
               </svg>
             </Link>
           )}
+
           {isAuthenticated && (
             <Link
               to="/chathome"
               className="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 dark:focus:ring-green-900"
             >
-              Chat Home
+              Go to Chat
               <svg
                 className="w-5 h-5 ml-2 -mr-1"
                 fill="currentColor"
@@ -58,6 +58,7 @@ const Hero = () => {
               </svg>
             </Link>
           )}
+
           {!isAuthenticated && (
             <Link
               to="/register"
@@ -67,8 +68,9 @@ const Hero = () => {
             </Link>
           )}
         </div>
+
         <div className="hidden lg:mt-0 lg:col-span-5 lg:flex">
-        <AnimationLottie animationPath={lottieFile} />
+          <AnimationLottie animationPath={lottieFile} />
         </div>
       </div>
     </section>

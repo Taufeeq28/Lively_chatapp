@@ -1,41 +1,47 @@
-import PropTypes from 'prop-types';
-import Cookies from "js-cookie";
-import { createContext, useContext, useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { createContext, useContext, useEffect, useState } from "react";
+import { auth } from "../firebaseConfig"; // Adjust this path as needed
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const setAuthenticated = (value) => {
-    setIsAuthenticated(value);
-  };
-
-  // ✅ Check authentication on page load
   useEffect(() => {
-    checkAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const token = await firebaseUser.getIdToken(); // 🔑 Get ID token here
+        console.log("Firebase ID Token:", token);
+        setUser(firebaseUser);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const checkAuth = () => {
-    const token = Cookies.get("authToken");
-    console.log("Checking authentication...");
-    console.log(token);
-    if (token) {
-      console.log("Token exists. Setting authenticated to true.");
-      setAuthenticated(true);
-    } else {
-      console.log("Token does not exist. Setting authenticated to false.");
-      setAuthenticated(false);
-    }
-  };
-
-  const logout = () => {
-    Cookies.remove("authToken");
-    setAuthenticated(false);
+  const logout = async () => {
+    await signOut(auth);
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setAuthenticated, checkAuth, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -45,6 +51,4 @@ AuthProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

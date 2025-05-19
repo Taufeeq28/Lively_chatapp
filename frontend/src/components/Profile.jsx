@@ -5,19 +5,22 @@ import { useProfile } from "../context/profileContext";
 import SelectAvatar from "./SelectAvatar";
 
 const Profile = () => {
-  const { userDetails } = useProfile(); // Assuming useProfile provides user details
+  const { userDetails } = useProfile();
   const [formData, setFormData] = useState({});
   const [selectedLink, setSelectedLink] = useState("");
 
   useEffect(() => {
-    setFormData(userDetails); // Pre-fill form with user details
+    if (userDetails) {
+      setFormData({
+        firstName: userDetails.firstName || "",
+        lastName: userDetails.lastName || "",
+      });
+      setSelectedLink(userDetails.avatarLink || "");
+    }
   }, [userDetails]);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -27,11 +30,9 @@ const Profile = () => {
         ...formData,
         avatarLink: selectedLink,
       });
-      console.log("Profile updated successfully:", response.data);
-      // You can handle success (like showing a success message or updating the context)
+      console.log("Profile updated:", response.data);
     } catch (error) {
       console.error("Error updating profile:", error);
-      // Handle error (e.g., show an error message)
     }
   };
 
@@ -43,63 +44,50 @@ const Profile = () => {
           <h2 className="mb-4 text-2xl font-bold text-white">Update Profile</h2>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6">
-              <div className="w-full">
-                <label htmlFor="firstName" className="block mb-2 text-sm font-medium text-white">
-                  First Name
-                </label>
+              <div>
+                <label htmlFor="firstName" className="text-sm text-white">First Name</label>
                 <input
                   type="text"
                   name="firstName"
                   id="firstName"
-                  className="border text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  value={formData.firstName || ""}
-                  placeholder="First Name"
+                  value={formData.firstName}
                   onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="w-full">
-                <label htmlFor="lastName" className="block mb-2 text-sm font-medium text-white">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  name="lastName"
-                  id="lastName"
-                  className="border text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  value={formData.lastName || ""}
-                  placeholder="Last Name"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-white">
-                  Email
-                </label>
-                <input
-                  type="text"
-                  name="email"
-                  id="email"
-                  disabled
-                  className="border text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  value={userDetails.email || ""}
-                  placeholder="Email"
+                  className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
                   required
                 />
               </div>
               <div>
+                <label htmlFor="lastName" className="text-sm text-white">Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+                  required
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="email" className="text-sm text-white">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  value={userDetails?.email || ""}
+                  disabled
+                  className="bg-gray-700 border border-gray-600 text-white rounded-lg w-full p-2.5"
+                />
+              </div>
+              <div className="sm:col-span-2">
                 <SelectAvatar setSelectedLink={setSelectedLink} selectedLink={selectedLink} />
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <button
-                type="submit"
-                className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-              >
-                Update Profile
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-5 py-2.5"
+            >
+              Update Profile
+            </button>
           </form>
         </div>
       </div>

@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -30,4 +32,4 @@ vendor
 *.log
 *.tmp
 .DS_Store
-.gitignore
+.env

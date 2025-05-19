@@ -85,7 +85,7 @@ const OnlineUsersList = ({
 OnlineUsersList.propTypes = {
   onlinePeople: PropTypes.object.isRequired,
   offlinePeople: PropTypes.object.isRequired,
-  selectedUserId: PropTypes.string.isRequired,
+  selectedUserId: PropTypes.string,
   setSelectedUserId: PropTypes.func.isRequired,
 };
 

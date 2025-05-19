@@ -1,37 +1,42 @@
-const jwt = require("jsonwebtoken");
 const { User } = require("../models/userModel");
 
+// GET /api/user/profile
 const profileController = async (req, res) => {
-  const token = req.cookies?.authToken;
-  if (token) {
-    jwt.verify(token, process.env.JWTPRIVATEKEY, {}, async (err, userData) => {
-      if (err) throw err;
-      const user = await User.findOne({ _id: userData._id });
-      res.json(user);
-    });
-  } else {
-    res.status(401).json("no token");
+  try {
+    const firebaseUid = req.user.uid;
+
+    const user = await User.findOne({ firebaseUid }).select("-password -__v");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error in profileController:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
+// PUT /api/user/profile/update
 const profileUpdate = async (req, res) => {
-  const token = req.cookies?.authToken;
-  if (token) {
-    jwt.verify(token, process.env.JWTPRIVATEKEY, {}, async (err, userData) => {
-      if (err) throw err;
-      const { firstName, lastName, email, avatarLink } = req.body;
-      const user = await User.findOne({ email });
-      if (user) {
-        user.firstName = firstName;
-        user.lastName = lastName;
-        user.email = email;
-        user.avatarLink = avsatarLink;
-        await user.save();
-      }
-      res.json(user);
-    });
-  } else {
-    res.status(401).json("no token");
+  try {
+    const firebaseUid = req.user.uid;
+    const { firstName, lastName, avatarLink } = req.body;
+
+    const user = await User.findOne({ firebaseUid });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.avatarLink = avatarLink || user.avatarLink;
+
+    await user.save();
+
+    res.json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    console.error("Error in profileUpdate:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

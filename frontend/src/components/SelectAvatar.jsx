@@ -20,18 +20,18 @@ const SelectAvatar = ({ setSelectedLink, selectedLink }) => {
 
   return (
     <div className="mt-3">
-      <p className="block mb-2 text-lg font-medium text-white">Choose Avatar</p>
+      <p className="text-lg font-medium text-white mb-2">Choose Avatar</p>
       <div className="grid grid-cols-4 gap-2 mb-7">
         {avatars.map((avatar) => (
           <img
             key={avatar._id}
             src={avatar.link}
-            onClick={() => setSelectedLink(avatar.link)}
             alt={`Avatar ${avatar._id}`}
-            style={{ width: "90px", height: "90px", margin: "5px" }}
+            onClick={() => setSelectedLink(avatar.link)}
             className={`rounded-full cursor-pointer p-2 bg-primary ${
-              selectedLink === avatar.link ? "outline" : ""
+              selectedLink === avatar.link ? "outline outline-2 outline-indigo-400" : ""
             }`}
+            style={{ width: "90px", height: "90px", margin: "5px" }}
           />
         ))}
       </div>

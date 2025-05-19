@@ -1,21 +1,24 @@
-const jwt = require("jsonwebtoken");
+const admin = require("../firebase");
+const path = require("path");
 
-async function protect(req) {
-  return new Promise((resolve, reject) => {
-    const token = req.cookies?.authToken;
-    console.log("Received token:", token);
-    if (token) {
-      jwt.verify(token, process.env.JWTPRIVATEKEY, {}, (err, userData) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(userData);
-        }
-      });
-    } else {
-      reject("no token");
-    }
-  });
+
+async function protect(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized: No token" });
+  }
+
+  const idToken = authHeader.split("Bearer ")[1];
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    req.user = decodedToken;
+    next(); // proceed to controller
+  } catch (error) {
+    console.error("Firebase token verification failed:", error);
+    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+  }
 }
 
 module.exports = protect;

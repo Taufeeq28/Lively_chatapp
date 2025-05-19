@@ -9,6 +9,8 @@ async function avatarController(req, res) {
   }
 
   try {
+    console.log("User:", req.user.email);
+
     // Create a new avatar entry in the database
     const newAvatar = new Avatar({ link });
     await newAvatar.save();

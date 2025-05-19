@@ -1,36 +1,22 @@
 const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const passwordComplexity = require("joi-password-complexity");
 
 const userSchema = new mongoose.Schema(
   {
+    firebaseUid: { type: String, required: true, unique: true }, // 🔐 optional if mapping to Firebase
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String, required: true },
-    verified: { type: Boolean, default: false },
+    password: { type: String }, // Optional if Firebase manages auth
+    verified: { type: Boolean, default: true }, // Firebase handles this
     verificationLinkSent: { type: Boolean, default: false },
     avatarLink: { type: String },
   },
   { timestamps: true }
 );
 
-userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign(
-    {
-      _id: this._id,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      email: this.email,
-    },
-    process.env.JWTPRIVATEKEY,
-    { expiresIn: "7d" }
-  );
-  return token;
-};
-
-const User = mongoose.model('user', userSchema);
+const User = mongoose.model("user", userSchema);
 
 const validateRegister = (data) => {
   const schema = Joi.object({
