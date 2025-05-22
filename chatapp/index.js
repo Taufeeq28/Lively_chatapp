@@ -1,3 +1,4 @@
+// ✅ .env must include required Mongo URI, PORT, Firebase secrets
 require("dotenv").config();
 require("./firebase");
 
@@ -7,30 +8,23 @@ const http = require("http");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 
-const connection = require("./db/db.js");
-const userRoute = require("./routes/userRoute.js");
-const avatarRoute = require("./routes/avatarRoute.js");
-const createWebSocketServer = require("./wsServer.js");
-
 const app = express();
 
-// ✅ Connect MongoDB
-connection();
-
-// ✅ CORS setup
+// ✅ Define allowed origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4000",
-  "https://lively-chatapp-frontend.vercel.app",
+  "https://lively-chatapp-frontend.vercel.app"
 ];
 
+// ✅ Setup CORS
 const corsOptions = {
   origin: (origin, callback) => {
-    console.log("CORS request from origin:", origin);
+    console.log("CORS Origin:", origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Blocked by CORS"));
     }
   },
   credentials: true,
@@ -39,29 +33,46 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
+// ✅ Apply CORS globally
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // ✅ Handle all OPTIONS preflight requests
-
-// ✅ Logging middleware (for debugging on Vercel)
-app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.originalUrl}`);
-  next();
+app.options("*", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.sendStatus(204);
 });
 
-// ✅ JSON & Cookie Parsers
+// ✅ Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ API Routes
+// ✅ Database and routing setup
+const connection = require("./db/db.js");
+const userRoute = require("./routes/userRoute.js");
+const avatarRoute = require("./routes/avatarRoute.js");
+const createWebSocketServer = require("./wsServer.js");
+
+connection(); // Connect MongoDB
+
+// ✅ API routes
 app.use("/api/user", userRoute);
 app.use("/api/avatar", avatarRoute);
 
-// ✅ Health Check
+// ✅ Health check
 app.get("/health", (req, res) => {
   res.send("Server is running");
 });
 
-// ✅ Serve Frontend
+// ✅ Debug route for CORS testing
+app.get("/cors-test", (req, res) => {
+  console.log("✔ /cors-test hit from:", req.headers.origin);
+  res.set("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.set("Access-Control-Allow-Credentials", "true");
+  res.send("CORS is working");
+});
+
+// ✅ Serve frontend
 app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
 
 app.get("/*", (req, res) => {
@@ -73,16 +84,7 @@ app.get("/*", (req, res) => {
   });
 });
 
-// ✅ Catch-all OPTIONS fallback for Vercel (safety net)
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.sendStatus(204);
-  } else {
-    next();
-  }
-});
-
-// ✅ Start HTTP server and WebSocket
+// ✅ Start server
 const port = process.env.PORT || 8000;
 const server = http.createServer(app);
 createWebSocketServer(server);
