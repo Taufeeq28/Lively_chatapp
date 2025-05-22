@@ -6,20 +6,28 @@ const cors = require("cors");
 const http = require("http");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+
+const connection = require("./db/db.js");
+const userRoute = require("./routes/userRoute.js");
+const avatarRoute = require("./routes/avatarRoute.js");
+const createWebSocketServer = require("./wsServer.js");
+
 const app = express();
+
+// ✅ Define CORS options before everything
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4000",
-  "https://lively-chatapp-frontend.vercel.app",
+  "https://lively-chatapp-frontend.vercel.app"
 ];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    console.log("CORS request from origin:", origin);
+    console.log("🔄 CORS request from origin:", origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("❌ Not allowed by CORS"));
     }
   },
   credentials: true,
@@ -28,56 +36,44 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-app.use(cors(corsOptions));
+// ✅ Apply middlewares in correct order
+app.use(cors(corsOptions));                 // CORS must come before routes
+app.options("*", cors(corsOptions));        // Handle preflight OPTIONS
 
-// ✅ Manually respond to preflight (fix for CORS error on OPTIONS)
-app.options("*", cors(corsOptions));
-
-const connection = require("./db/db.js");
-const userRoute = require("./routes/userRoute.js");
-const avatarRoute = require("./routes/avatarRoute.js");
-const createWebSocketServer = require("./wsServer.js");
-
-
+app.use(express.json());                    // JSON parser
+app.use(cookieParser());                    // Cookie parser
 
 // ✅ Connect MongoDB
 connection();
 
-// ✅ Middlewares
-app.use(express.json());
-app.use(cookieParser());
-
-// ✅ CORS setup (Handles frontend properly avoids 500 on OPTIONS)
-
-
-// ✅ Routes
+// ✅ API Routes
 app.use("/api/user", userRoute);
 app.use("/api/avatar", avatarRoute);
 
-// ✅ Health check route
+// ✅ Health check
 app.get("/health", (req, res) => {
   res.send("Server is running");
 });
 
-// ✅ Serve frontend
+// ✅ Static frontend (after API)
 app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
-
 app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "frontend", "dist", "index.html"), (err) => {
-    if (err) {
-      console.error("Error sending file:", err);
-      res.status(500).send("Error loading frontend");
+  res.sendFile(
+    path.join(__dirname, "..", "frontend", "dist", "index.html"),
+    (err) => {
+      if (err) {
+        console.error("Error sending file:", err);
+        res.status(500).send("Error loading frontend");
+      }
     }
-  });
+  );
 });
 
-// ✅ Start HTTP server
+// ✅ Start HTTP + WebSocket server
 const port = process.env.PORT || 8000;
 const server = http.createServer(app);
-
-// ✅ Attach WebSocket server
 createWebSocketServer(server);
 
 server.listen(port, () => {
-  console.log(`✅ Application is running on port ${port}`);
+  console.log(`✅ Server is running on port ${port}`);
 });
