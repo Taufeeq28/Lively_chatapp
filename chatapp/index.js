@@ -14,20 +14,23 @@ const createWebSocketServer = require("./wsServer.js");
 
 const app = express();
 
-// ✅ Define CORS options before everything
+// ✅ Connect MongoDB
+connection();
+
+// ✅ CORS setup
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4000",
-  "https://lively-chatapp-frontend.vercel.app"
+  "https://lively-chatapp-frontend.vercel.app",
 ];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    console.log("🔄 CORS request from origin:", origin);
+    console.log("CORS request from origin:", origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("❌ Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
@@ -36,44 +39,54 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// ✅ Apply middlewares in correct order
-app.use(cors(corsOptions));                 // CORS must come before routes
-app.options("*", cors(corsOptions));        // Handle preflight OPTIONS
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // ✅ Handle all OPTIONS preflight requests
 
-app.use(express.json());                    // JSON parser
-app.use(cookieParser());                    // Cookie parser
+// ✅ Logging middleware (for debugging on Vercel)
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.originalUrl}`);
+  next();
+});
 
-// ✅ Connect MongoDB
-connection();
+// ✅ JSON & Cookie Parsers
+app.use(express.json());
+app.use(cookieParser());
 
 // ✅ API Routes
 app.use("/api/user", userRoute);
 app.use("/api/avatar", avatarRoute);
 
-// ✅ Health check
+// ✅ Health Check
 app.get("/health", (req, res) => {
   res.send("Server is running");
 });
 
-// ✅ Static frontend (after API)
+// ✅ Serve Frontend
 app.use(express.static(path.join(__dirname, "..", "frontend", "dist")));
+
 app.get("/*", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "..", "frontend", "dist", "index.html"),
-    (err) => {
-      if (err) {
-        console.error("Error sending file:", err);
-        res.status(500).send("Error loading frontend");
-      }
+  res.sendFile(path.join(__dirname, "..", "frontend", "dist", "index.html"), (err) => {
+    if (err) {
+      console.error("Error sending file:", err);
+      res.status(500).send("Error loading frontend");
     }
-  );
+  });
 });
 
-// ✅ Start HTTP + WebSocket server
+// ✅ Catch-all OPTIONS fallback for Vercel (safety net)
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+  } else {
+    next();
+  }
+});
+
+// ✅ Start HTTP server and WebSocket
 const port = process.env.PORT || 8000;
 const server = http.createServer(app);
 createWebSocketServer(server);
 
 server.listen(port, () => {
-  console.log(`✅ Server is running on port ${port}`);
+  console.log(`✅ Application is running on port ${port}`);
 });
