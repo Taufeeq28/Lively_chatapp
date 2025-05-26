@@ -1,13 +1,18 @@
 const Message = require("../models/messageModel");
 
 const messageController = async (req, res) => {
+  // ✅ Add CORS headers manually
+  res.setHeader("Access-Control-Allow-Origin", "https://lively-chatapp-frontend.vercel.app");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
   try {
     const { userId } = req.params;
 
     // Firebase token is already verified and attached in req.user by protect middleware
     const currentUserUid = req.user.uid;
 
-    // You can now find your MongoDB user by firebaseUid or email (preferably UID)
     const { User } = require("../models/userModel");
     const ourUser = await User.findOne({ firebaseUid: currentUserUid });
 
@@ -22,10 +27,10 @@ const messageController = async (req, res) => {
       recipient: { $in: [userId, ourUserId] },
     }).sort({ createdAt: 1 });
 
-    res.json(messages);
+    return res.status(200).json(messages);
   } catch (error) {
     console.error("Error in messageController:", error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

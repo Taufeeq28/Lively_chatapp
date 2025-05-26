@@ -13,8 +13,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const token = await firebaseUser.getIdToken(); // 🔑 Get ID token here
-        console.log("Firebase ID Token:", token);
+        //const token = await firebaseUser.getIdToken(); // 🔑 Get ID token here
+        //console.log("Firebase ID Token:", token);
         setUser(firebaseUser);
         setIsAuthenticated(true);
       } else {

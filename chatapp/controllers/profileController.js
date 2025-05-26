@@ -2,6 +2,11 @@ const { User } = require("../models/userModel");
 
 // GET /api/user/profile
 const profileController = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://lively-chatapp-frontend.vercel.app");
+res.setHeader("Access-Control-Allow-Credentials", "true");
+res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
   try {
     const firebaseUid = req.user.uid;
 

@@ -1,23 +1,23 @@
 const admin = require("../firebase");
-const path = require("path");
-
 
 async function protect(req, res, next) {
-  const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization || req.headers.Authorization;
 
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized: No token" });
+  // ✅ Handle missing or malformed token
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized: Missing or invalid token format" });
   }
 
-  const idToken = authHeader.split("Bearer ")[1];
+  const idToken = authHeader.replace("Bearer ", "").trim();
 
   try {
+    // ✅ Verify Firebase ID Token
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     req.user = decodedToken;
-    next(); // proceed to controller
+    next();
   } catch (error) {
-    console.error("Firebase token verification failed:", error);
-    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    console.error("🔥 Firebase token verification failed:", error.message);
+    return res.status(403).json({ message: "Forbidden: Invalid or expired token" });
   }
 }
 

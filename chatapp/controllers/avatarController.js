@@ -1,6 +1,11 @@
 const Avatar = require("../models/avatars");
 
 async function avatarController(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "https://lively-chatapp-frontend.vercel.app");
+res.setHeader("Access-Control-Allow-Credentials", "true");
+res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
   const { link } = req.body;
 
   // Check if the link is provided
