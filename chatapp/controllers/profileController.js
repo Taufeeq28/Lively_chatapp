@@ -23,6 +23,11 @@ res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 };
 // PUT /api/user/profile/update
 const profileUpdate = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://lively-chatapp-frontend.vercel.app");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
   try {
     const firebaseUid = req.user.uid;
     const { firstName, lastName, avatarLink } = req.body;
